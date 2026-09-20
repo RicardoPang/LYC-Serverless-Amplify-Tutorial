@@ -79,6 +79,7 @@
 
     <script src="js/vendor/jquery-3.1.0.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/config.js"></script>
     <script src="https://js.arcgis.com/4.27/"></script>
 
     <script>
@@ -141,14 +142,27 @@
 
             // 取消现有按钮功能，改为新的功能
             document.getElementById("confirmButton").addEventListener("click", function() {
-                // 发送 GET 请求到新的 API Gateway
-                fetch("请修改成你的apigw地址", { //e.g. https://jvyda4tsmj.execute-api.us-east-1.amazonaws.com/prd/
+                // 发送 GET 请求到 API Gateway
+                fetch(_config.api.invokeUrl, {
                     method: "GET"
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP " + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    console.log("Response from API:", data);
-                    alert("Data successfully added!");
+                    // 兼容 API Gateway 未开启 Lambda 代理时返回 {statusCode, body}
+                    const payload = typeof data.body === "string"
+                        ? JSON.parse(data.body)
+                        : data;
+                    console.log("Response from API:", payload);
+                    if (payload.message) {
+                        alert("Data successfully added!");
+                    } else {
+                        throw new Error("Unexpected API response");
+                    }
                 })
                 .catch(error => {
                     console.error("Error calling API:", error);
