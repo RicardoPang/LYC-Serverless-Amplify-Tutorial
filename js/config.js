@@ -5,6 +5,7 @@ window._config = {
     region: 'ap-northeast-1', // e.g. us-east-2
   },
   api: {
-    invokeUrl: '', //本次不使用，这里请留空
+    invokeUrl:
+      'https://2oaj8uioul.execute-api.ap-northeast-1.amazonaws.com/prd/', //本次不使用，这里请留空
   },
 };
